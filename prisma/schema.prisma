@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model StoreCreditLog {
+    id String @id @default(cuid())
+
+    userId String
+    adminId String
+    guildId String
+    timestamp DateTime
+    amount Float
+    reason String
+}
+
+model DiscordTribe {
+    id String @id @default(cuid())
+
+    name String @unique
+    colour String
+    guildId String
+    roleId String
+
+    users String[]
+    invites DiscordTribeInvite[]
+
+    @@unique([guildId, name])
+}
+
+model DiscordTribeInvite {
+    userId String
+    targetId String
+
+    tribeId String
+    tribe DiscordTribe @relation(fields: [tribeId], references: [id], onDelete: Cascade)
+
+    @@unique([tribeId, targetId])
+}
