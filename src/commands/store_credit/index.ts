@@ -83,5 +83,6 @@ export = {
 				.setDescription("Shows a leaderboard for store credit")
 		),
 	botPermissions: [],
+	enabled: "enableCredit",
 	deleted: false
 } as CommandObject;

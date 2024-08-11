@@ -16,6 +16,7 @@ export = {
 		.setName("credit")
 		.setDescription("Allows users to check their credit balance"),
 	botPermissions: [],
+	enabled: "enableCredit",
 	deleted: false,
 
 	callback: async (client: Client, interaction: CommandInteraction) => {

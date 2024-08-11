@@ -25,6 +25,7 @@ export interface CommandObject {
 	botPermissions?: bigint[] = [];
 	deleted?: boolean = false;
 	deferred?: boolean = true;
+	enabled?: keyof DBGuild | boolean;
 	callback?: (
 		client: Client,
 		interaction: CommandInteraction & { guild: Guild },
@@ -53,6 +54,7 @@ export interface ContextMenuObject {
 	data: ContextMenuCommandBuilder;
 	deferred?: boolean = true;
 	botPermissions?: bigint[] = [];
+	enabled?: keyof typeof DBGuild | boolean;
 	callback: (
 		client: Client,
 		interaction: ContextMenuCommandInteraction
@@ -75,6 +77,7 @@ export interface ButtonObject {
 	data: ButtonData;
 	permissions?: bigint[] = [];
 	deferred?: boolean = true;
+	enabled?: keyof typeof DBGuild | boolean;
 	callback: (
 		client: Client,
 		interaction: ButtonInteraction,

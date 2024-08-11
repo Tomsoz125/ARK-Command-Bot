@@ -1,35 +1,26 @@
 import { db } from "db";
-import { CommandObject } from "typings";
+import { ButtonObject, CommandObject, ContextMenuObject } from "typings";
+
+const defaultValue = false;
 
 export = async ({
 	commandObject,
 	guildId
 }: {
-	commandObject: CommandObject;
+	commandObject: CommandObject | ContextMenuObject | ButtonObject;
 	guildId: string;
 }) => {
 	const dbGuild = await db.guild.findUnique({
 		where: { discordId: guildId }
 	});
-	if (commandObject.data.name === "tribe" && !dbGuild?.enableTribes) {
-		return false;
+	let enabled = commandObject.enabled || defaultValue;
+	if (typeof enabled === "boolean") {
+		return enabled;
 	}
-	if (
-		(commandObject.data.name === "credit" ||
-			commandObject.data.name === "store_credit" ||
-			commandObject.data.name === "Store Credit") &&
-		!dbGuild?.enableCredit
-	) {
-		return false;
+	enabled = enabled as keyof typeof dbGuild;
+	if (!dbGuild || !(enabled in dbGuild)) {
+		return defaultValue;
 	}
-	if (
-		commandObject.data.name === "cluster_alpha" &&
-		!dbGuild?.enableClusterAlpha
-	) {
-		return false;
-	}
-	if (commandObject.data.name === "ticket" && !dbGuild?.enableTickets) {
-		return false;
-	}
-	return true;
+	const enabledDb: any = dbGuild[enabled];
+	return enabledDb;
 };
