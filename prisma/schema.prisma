@@ -37,33 +37,33 @@ model Cluster {
 model Guild {
     id String @id @default(cuid())
 
-    clusterId String
-    cluster Cluster @relation(fields: [clusterId], references: [id]) // The cluster that the guild is in
+    clusterId String?
+    cluster Cluster? @relation(fields: [clusterId], references: [id]) // The cluster that the guild is in
 
-    discordId String // The discord id of the guild
+    discordId String @unique // The discord id of the guild
 
-    enableTribes Boolean @default(true) // Whether to use the tribes feature
+    enableTribes Boolean @default(false) // Whether to use the tribes feature
     enableTribeChat Boolean @default(true) // Whether to create a seperate chat channel for all tribes
     discordTribe DiscordTribe[] // The array of tribes for this guild
     tribeUserLimit Int @default(4) // The maximum number of users per tribe
     tribeRoleMentionable Boolean @default(true) // Whether the tribe role is mentionable to all users
 
-    enableCredit Boolean @default(true) // Whether the store credit feature is enabled
+    enableCredit Boolean @default(false) // Whether the store credit feature is enabled
     creditExpires Int @default(2678400) // The number of seconds until credit expires
     creditLog StoreCreditLog[] // The log of store credit
 
-    enableClusterAlpha Boolean @default(true) // Whether to enable the cluster alpha module
-    caLeaderboardChannelId String // The ID of the channel to post the leaderboard in
-    caRulesChannelId String // The ID of the channel to post the rules in
-    caRulesMessage Json // The message to send in the cluster alpha rules channel
+    enableClusterAlpha Boolean @default(false) // Whether to enable the cluster alpha module
+    caLeaderboardChannelId String? // The ID of the channel to post the leaderboard in
+    caRulesChannelId String? // The ID of the channel to post the rules in
+    caRulesMessage Json? // The message to send in the cluster alpha rules channel
 
-    enableTickets Boolean @default(true) // Whether to enable the tickets module
+    enableTickets Boolean @default(false) // Whether to enable the tickets module
     enableClaiming Boolean @default(true) // Whether to allow admins to claim tickets
     enableTranscripts Boolean @default(true) // Whether to enable transcripts being recorded in tickets
     addTribeToTicket Boolean @default(false) // Whether to all whole tribe to a users ticket, tribes must be enabled
-    ticketTranscriptChannelId String // The id of the channel to save transcripts in
-    ticketRequestChannelId String // The id of the channel to request tickets in
-    ticketRequestMessage Json // The message to send in the ticket request channel
+    ticketTranscriptChannelId String? // The id of the channel to save transcripts in
+    ticketRequestChannelId String? // The id of the channel to request tickets in
+    ticketRequestMessage Json? // The message to send in the ticket request channel
     ticketCategories TicketCategory[] // An array of categories for tickets
 }
 

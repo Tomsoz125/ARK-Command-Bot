@@ -1,16 +1,8 @@
-import {
-	Client,
-	REST,
-	RESTPostAPIChatInputApplicationCommandsJSONBody,
-	Routes
-} from "discord.js";
 import fs from "fs";
 import path from "path";
 import { CommandObject, ContextMenuObject } from "typings";
-
-const commands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
-
-export = async (client: Client) => {
+export = () => {
+	const commands: CommandObject[] = [];
 	const foldersPath = path.join(__dirname, "../../commands");
 	const commandFolders = fs.readdirSync(foldersPath);
 	for (const folder of commandFolders) {
@@ -19,7 +11,7 @@ export = async (client: Client) => {
 			const command: CommandObject = require(filePath);
 			if ("data" in command && "callback" in command) {
 				command.data = command.data.setDMPermission(false);
-				commands.push(command.data.toJSON());
+				commands.push(command);
 			} else {
 				console.log(
 					`[WARNING] The command at ${filePath} is missing a required "data" and "callback" property.`
@@ -43,7 +35,7 @@ export = async (client: Client) => {
 				"index.ts"
 			)) as CommandObject;
 			command.data = command.data.setDMPermission(false);
-			commands.push(command.data.toJSON());
+			commands.push(command);
 		}
 	}
 
@@ -54,35 +46,12 @@ export = async (client: Client) => {
 		const command: ContextMenuObject = require(filePath);
 		if ("data" in command && "callback" in command) {
 			command.data = command.data.setDMPermission(false);
-			commands.push(command.data.toJSON());
+			commands.push(command);
 		} else {
 			console.log(
 				`[WARNING] The context menu at ${filePath} is missing a required "data" or "execute" property.`
 			);
 		}
 	}
-	// Construct and prepare an instance of the REST module
-	const rest = new REST().setToken(process.env.BOT_TOKEN!);
-
-	// and deploy your commands!
-	(async () => {
-		try {
-			console.log(
-				`Started refreshing ${commands.length} application (/) commands.`
-			);
-
-			// The put method is used to fully refresh all commands in the guild with the current set
-			const data: any = await rest.put(
-				Routes.applicationCommands(client.user!.id),
-				{ body: commands }
-			);
-
-			console.log(
-				`Successfully reloaded ${data.length} application (/) commands.`
-			);
-		} catch (error) {
-			// And of course, make sure you catch and log any errors!
-			console.error(error);
-		}
-	})();
+	return commands;
 };

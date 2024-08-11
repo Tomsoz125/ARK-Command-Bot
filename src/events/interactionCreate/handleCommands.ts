@@ -5,6 +5,7 @@ import {
 	Interaction,
 	PermissionsBitField
 } from "discord.js";
+import checkCommandEnabled from "src/utils/commands/checkCommandEnabled";
 import { SubcommandObject } from "typings";
 import getLocalCommands from "../../utils/commands/getLocalCommands";
 import getUnexpectedErrorEmbed from "../../utils/embeds/getUnexpectedErrorEmbed";
@@ -18,11 +19,21 @@ export = async (client: Client, interaction: Interaction) => {
 			(cmd) => cmd.data.name === interaction.commandName
 		);
 		if (!commandObject) return;
+
 		if (commandObject.deferred || commandObject.deferred === undefined)
 			await interaction.deferReply({ ephemeral: true });
 
 		if (!interaction.guild && interaction.user.id !== "724833136894279690")
 			return;
+
+		if (
+			!(await checkCommandEnabled({
+				commandObject,
+				guildId: interaction.guild!.id
+			}))
+		) {
+			return;
+		}
 
 		if (commandObject.botPermissions?.length) {
 			let missingPerms = [];
