@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { db } from "db";
 import { ColorResolvable, Guild, GuildMember } from "discord.js";
 import { APIResponse } from "typings";
+import joinTribe from "./joinTribe";
 
 export = async ({
 	member,
@@ -40,11 +41,11 @@ export = async ({
 
 	try {
 		// Attempts to create the database object
-		await db.discordTribe.create({
+		var tribe = await db.discordTribe.create({
 			data: {
 				colour,
 				name,
-				users: [member.id],
+				users: [],
 				guildId: guild.id,
 				roleId: role.id
 			}
@@ -66,15 +67,5 @@ export = async ({
 		};
 	}
 
-	// If the bot can manage the user
-	if (member.manageable) {
-		member.roles.add(role); // Give the user the tribe role
-		return { success: true, message: "Successfully created your tribe!" }; // Send a success message
-	} else {
-		// If the bot can't manage the user, send error message
-		return {
-			success: false,
-			message: "I don't have permission to give you roles!"
-		};
-	}
+	return await joinTribe({ member, tribeId: tribe.id });
 };

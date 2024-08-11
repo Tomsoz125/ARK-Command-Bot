@@ -13,37 +13,141 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TicketQuestionActions {
+    PING_URL
+    DISPLAY_RESPONSE
+}
+model Cluster {
+    id String @id @default(cuid())
+    
+    discordManagerId String // The discord user id of the manager of the cluster
+
+    guilds Guild[] // The array of guilds that are in this cluster, the one at id 0 is the primary guild, the guild that shares its settings in the ShareGuildSettings toggle
+    sharedRoles SharedRoles[] // The array of roles to be shared across guilds, requires shareRoles to be enabled.
+
+    clusterName String // The name of the cluster
+
+    shareCA Boolean @default(false) // Whether to share CA in the cluster
+    shareTribes Boolean @default(false) // Whether to share tribes in the cluster
+    shareCredit Boolean @default(true)  // Whether to share store credit in the cluster
+    shareRoles Boolean @default(true) // Whether to share all discord roles between the cluster, for example admins will be shared. Only works if SharedRoles is setup
+    shareGuildSettings Boolean @default(true) // Whether to share all of the discord settings between clustered servers, the one copied from is index 0 in guilds array
+}
+
+model Guild {
+    id String @id @default(cuid())
+
+    clusterId String
+    cluster Cluster @relation(fields: [clusterId], references: [id]) // The cluster that the guild is in
+
+    discordId String // The discord id of the guild
+
+    enableTribes Boolean @default(true) // Whether to use the tribes feature
+    enableTribeChat Boolean @default(true) // Whether to create a seperate chat channel for all tribes
+    discordTribe DiscordTribe[] // The array of tribes for this guild
+    tribeUserLimit Int @default(4) // The maximum number of users per tribe
+    tribeRoleMentionable Boolean @default(true) // Whether the tribe role is mentionable to all users
+
+    enableCredit Boolean @default(true) // Whether the store credit feature is enabled
+    creditExpires Int @default(2678400) // The number of seconds until credit expires
+    creditLog StoreCreditLog[] // The log of store credit
+
+    enableClusterAlpha Boolean @default(true) // Whether to enable the cluster alpha module
+    caLeaderboardChannelId String // The ID of the channel to post the leaderboard in
+    caRulesChannelId String // The ID of the channel to post the rules in
+    caRulesMessage Json // The message to send in the cluster alpha rules channel
+
+    enableTickets Boolean @default(true) // Whether to enable the tickets module
+    enableClaiming Boolean @default(true) // Whether to allow admins to claim tickets
+    enableTranscripts Boolean @default(true) // Whether to enable transcripts being recorded in tickets
+    addTribeToTicket Boolean @default(false) // Whether to all whole tribe to a users ticket, tribes must be enabled
+    ticketTranscriptChannelId String // The id of the channel to save transcripts in
+    ticketRequestChannelId String // The id of the channel to request tickets in
+    ticketRequestMessage Json // The message to send in the ticket request channel
+    ticketCategories TicketCategory[] // An array of categories for tickets
+}
+
 model StoreCreditLog {
     id String @id @default(cuid())
 
-    userId String
-    adminId String
-    guildId String
-    timestamp DateTime
-    amount Float
-    reason String
+    userId String // The user that the credit belongs to
+    adminId String // The admin who gave that credit
+
+    guildId String // The guild that the credit applies on
+    guild Guild @relation(fields: [guildId], references: [id])
+
+    timestamp DateTime @default(now()) // The time that the credit was applied at
+    amount Int // The amount of credit that was given
+    reason String @default("No reason given") // The reason for giving the credit
+
+    expiresAt DateTime // The time that the credit expires at
+    expired Boolean @default(false) // If the credit is expired or not
+}
+
+model SharedRoles {
+    id String @id @default(cuid())
+
+    name String // The name of the role to share
+    roleInfo Json[] // The info on that role across the cluster. Eg. [{roleId: "38094730954", guildId: "4836942"}]
+
+    clusterId String // The cluster that these roles are shared across
+    cluster Cluster @relation(fields: [clusterId], references: [id])
 }
 
 model DiscordTribe {
     id String @id @default(cuid())
 
-    name String @unique
-    colour String
-    guildId String
-    roleId String
+    name String // The name of the tribe
+    colour String // The colour of the tribe
 
-    users String[]
+    guildId String // The guild that the tribe exists in
+    guild Guild @relation(fields: [guildId], references: [id])
+
+    tribeDiscordRoleInfo Json[] // The info on that role across the cluster. Eg. [{roleId: "38094730954", guildId: "4836942"}] (seperate from SharedRoles because that way people can disable sharing roles but still share tribes)
+
+    users String[] @default([]) // An array of users in the tribe
     invites DiscordTribeInvite[]
 
     @@unique([guildId, name])
 }
 
 model DiscordTribeInvite {
-    userId String
-    targetId String
+    userId String // The discord id of the user who invited them
+    targetId String // The discord id of the user who was invited
 
-    tribeId String
-    tribe DiscordTribe @relation(fields: [tribeId], references: [id], onDelete: Cascade)
+    tribeId String // The id of the tribe they were invited to
+    tribe DiscordTribe @relation(fields: [tribeId], references: [id])
 
-    @@unique([tribeId, targetId])
+    @@unique([targetId, tribeId])
+}
+
+model TicketCategory {
+    id String @id @default(cuid())
+
+    name String // The name of the ticket category
+
+    guildId String // The id of the guild that the category is on
+    guild Guild @relation(fields: [guildId], references: [id])
+
+    roleInfo Json[] // An array of the roles that can access a ticket in this category and the permissions they have
+    // format: [{roleId: "38094730954", permissions: 4836942}]
+
+    pingRoles String[] // An array of the role ids that are pinged when a ticket is opened
+
+    claimedRoleInfo Json[] // An array of the roles that can access a claimed ticket in this category and the permissions they have (the user that claimed the ticket already has perms in that channel)
+    // format: [{roleId: "38094730954", permissions: 4836942}]
+
+    ticketQuestions TicketQuestions[] // An array of the questions in the ticket category
+}
+
+model TicketQuestions {
+    categoryId String // The category that the question is linked to
+    category TicketCategory @relation(fields: [categoryId], references: [id])
+
+    question String // The question that will be displayed
+
+    action TicketQuestionActions // The action to perform
+    data Json? // The data to pass to the action
+
+    @@unique([categoryId, question])
 }

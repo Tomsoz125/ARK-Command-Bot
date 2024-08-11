@@ -64,3 +64,20 @@ export interface APIResponse {
 	message: string;
 	data?: any;
 }
+
+export interface ButtonData {
+	startsWith?: boolean = true;
+	customId: string;
+	name: string;
+}
+
+export interface ButtonObject {
+	data: ButtonData;
+	permissions?: bigint[] = [];
+	deferred?: boolean = true;
+	callback: (
+		client: Client,
+		interaction: ButtonInteraction,
+		argument: string
+	) => unknown;
+}
