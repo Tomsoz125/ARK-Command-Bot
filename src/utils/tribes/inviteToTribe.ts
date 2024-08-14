@@ -11,6 +11,7 @@ import {
 } from "discord.js";
 import { APIResponse } from "typings";
 import { colours } from "../../../config.json";
+import getCommandLink from "../getCommandLink";
 
 export = async ({
 	tribe,
@@ -31,9 +32,15 @@ export = async ({
 		});
 	} catch (e) {
 		if (e instanceof Prisma.PrismaClientKnownRequestError) {
+			const guilds = await client.guilds.fetch();
+			const guild = await guilds
+				.find((g) => g.id === tribe.guildId)!
+				.fetch();
 			return {
 				success: false,
-				message: `Your tribe already has an outgoing invitation to this user!\nYou can use TODO:COMMAAND ID HERE to revoke the invite.`
+				message: `Your tribe already has an outgoing invitation to this user!\nYou can use ${await getCommandLink(
+					{ command: "/tribe invite revoke", guild }
+				)} to revoke the invite.`
 			};
 		}
 

@@ -47,7 +47,6 @@ export = {
 				);
 			}
 			const tribe = tribeResponse.data;
-
 			const response = await inviteToTribe({
 				tribe,
 				user,

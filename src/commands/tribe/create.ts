@@ -9,6 +9,7 @@ import {
 import colours from "src/utils/colours";
 import getErrorEmbed from "src/utils/embeds/getErrorEmbed";
 import getSuccessEmbed from "src/utils/embeds/getSuccessEmbed";
+import getCommandLink from "src/utils/getCommandLink";
 import randomNumber from "src/utils/randomNumber";
 import createTribe from "src/utils/tribes/createTribe";
 import getUserTribe from "src/utils/tribes/getUserTribe";
@@ -33,7 +34,12 @@ export = {
 					getErrorEmbed(
 						interaction as Interaction,
 						name,
-						"You need to leave your current tribe before you can make a new one!\n</tribe leave:1271591910758285312>"
+						`You need to leave your current tribe before you can make a new one!\n${await getCommandLink(
+							{
+								command: "/tribe leave",
+								guild: interaction.guild!
+							}
+						)}`
 					)
 				);
 			}

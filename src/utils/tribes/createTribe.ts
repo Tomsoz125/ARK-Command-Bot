@@ -16,10 +16,11 @@ export = async ({
 	guild: Guild;
 }): Promise<APIResponse> => {
 	// Checks if there is a role with that name or if there is a database object with that name
+	const roles = await guild.roles.fetch();
 	const existing =
-		(await guild.roles.cache.find((role) => role.name === name)) ||
+		roles.find((role) => role.name === name) ||
 		!!(await db.discordTribe.findUnique({
-			where: { name, guildId: guild.id }
+			where: { guildId_name: { guildId: guild.id, name } }
 		}));
 
 	// If so, fail out and say a tribe already exists.
@@ -38,21 +39,20 @@ export = async ({
 		mentionable: true,
 		position: 0
 	});
-
 	try {
 		// Attempts to create the database object
 		var tribe = await db.discordTribe.create({
 			data: {
 				colour,
 				name,
-				users: [],
 				guildId: guild.id,
-				roleId: role.id
+				tribeDiscordRoleInfo: [{ roleId: role.id, guildId: guild.id }]
 			}
 		});
 	} catch (e) {
 		// If prisma found duplicates, throw an error
 		if (e instanceof Prisma.PrismaClientKnownRequestError) {
+			console.error(e);
 			return {
 				success: false,
 				message: "A tribe already exists with this name!"

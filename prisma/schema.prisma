@@ -74,7 +74,7 @@ model StoreCreditLog {
     adminId String // The admin who gave that credit
 
     guildId String // The guild that the credit applies on
-    guild Guild @relation(fields: [guildId], references: [id])
+    guild Guild @relation(fields: [guildId], references: [discordId])
 
     timestamp DateTime @default(now()) // The time that the credit was applied at
     amount Int // The amount of credit that was given
@@ -101,7 +101,7 @@ model DiscordTribe {
     colour String // The colour of the tribe
 
     guildId String // The guild that the tribe exists in
-    guild Guild @relation(fields: [guildId], references: [id])
+    guild Guild @relation(fields: [guildId], references: [discordId])
 
     tribeDiscordRoleInfo Json[] // The info on that role across the cluster. Eg. [{roleId: "38094730954", guildId: "4836942"}] (seperate from SharedRoles because that way people can disable sharing roles but still share tribes)
 
@@ -127,7 +127,7 @@ model TicketCategory {
     name String // The name of the ticket category
 
     guildId String // The id of the guild that the category is on
-    guild Guild @relation(fields: [guildId], references: [id])
+    guild Guild @relation(fields: [guildId], references: [discordId])
 
     roleInfo Json[] // An array of the roles that can access a ticket in this category and the permissions they have
     // format: [{roleId: "38094730954", permissions: 4836942}]

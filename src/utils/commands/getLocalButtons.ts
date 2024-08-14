@@ -1,7 +1,7 @@
 import { ButtonObject } from "typings";
 
 const path = require("path");
-const getAllFiles = require("./getAllFiles");
+const getAllFiles = require("../getAllFiles");
 
 export = (): ButtonObject[] => {
 	let localMenus = [];

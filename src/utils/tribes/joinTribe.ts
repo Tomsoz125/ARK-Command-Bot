@@ -1,6 +1,8 @@
+import { JsonObject } from "@prisma/client/runtime/library";
 import { db } from "db";
 import { GuildMember } from "discord.js";
 import { APIResponse } from "typings";
+import getCommandLink from "../getCommandLink";
 import getUserTribe from "./getUserTribe";
 
 export = async ({
@@ -14,7 +16,9 @@ export = async ({
 	if (currentTribe.success) {
 		return {
 			success: false,
-			message: `You need to leave your current tribe before you can join a new one.\n</tribe leave:1271591910758285312>`
+			message: `You need to leave your current tribe before you can join a new one.\n${await getCommandLink(
+				{ command: "/tribe leave", guild: member.guild }
+			)}`
 		};
 	}
 
@@ -32,8 +36,14 @@ export = async ({
 
 	// If the bot can manage the user
 	if (member.manageable) {
-		member.roles.add(tribe.roleId); // Give the user the tribe role
-		return { success: true, message: "Successfully created your tribe!" }; // Send a success message
+		let roles = tribe.tribeDiscordRoleInfo as JsonObject[];
+		roles = roles.filter((value) => value.guildId === member.guild.id);
+		if (roles.length > 0)
+			member.roles.add(roles[0].roleId as string, "Tribe"); // Give the user the tribe role
+		return {
+			success: true,
+			message: "Successfully added you to the tribe!"
+		}; // Send a success message
 	} else {
 		// If the bot can't manage the user, send error message
 		return {

@@ -62,6 +62,6 @@ export = {
 				)
 		),
 	botPermissions: [PermissionFlagsBits.ManageRoles],
-	enabled: "enableTries",
+	enabled: "enableTribes",
 	deleted: false
 } as CommandObject;
