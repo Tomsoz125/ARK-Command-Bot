@@ -10,7 +10,7 @@ import colours from "src/utils/colours";
 import getErrorEmbed from "src/utils/embeds/getErrorEmbed";
 import getSuccessEmbed from "src/utils/embeds/getSuccessEmbed";
 import getUserTribe from "src/utils/tribes/getUserTribe";
-import inviteToTribe from "src/utils/tribes/inviteToTribe";
+import inviteToTribe from "src/utils/tribes/invite/inviteToTribe";
 
 const cols = colours;
 

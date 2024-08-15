@@ -7,7 +7,7 @@ export = (): ButtonObject[] => {
 	let localMenus = [];
 
 	for (const menu of [
-		...getAllFiles(path.join(__dirname, "..", "buttons"))
+		...getAllFiles(path.join(__dirname, "../../", "buttons"))
 	]) {
 		localMenus.push(require(menu));
 	}

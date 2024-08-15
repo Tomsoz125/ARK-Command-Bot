@@ -7,9 +7,11 @@ import {
 	Interaction
 } from "discord.js";
 import getErrorEmbed from "src/utils/embeds/getErrorEmbed";
+import getSuccessEmbed from "src/utils/embeds/getSuccessEmbed";
 import getCommandLink from "src/utils/getCommandLink";
 import getTribeInvite from "src/utils/tribes/getTribeInvite";
 import getUserTribe from "src/utils/tribes/getUserTribe";
+import revokeInvite from "src/utils/tribes/invite/revokeInvite";
 
 let name = "Revoke Invite";
 
@@ -68,7 +70,20 @@ export = {
 				);
 			}
 
-			//TODO: finish
+			const res = await revokeInvite({ tribe, client, target, user });
+			if (!res.success) {
+				return await interaction.editReply(
+					getErrorEmbed(interaction as Interaction, name, res.message)
+				);
+			} else {
+				return await interaction.editReply(
+					getSuccessEmbed(
+						interaction as Interaction,
+						name,
+						res.message
+					)
+				);
+			}
 		}
 	}
 };

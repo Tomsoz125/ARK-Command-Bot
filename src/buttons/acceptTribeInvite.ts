@@ -1,5 +1,5 @@
 import { DiscordTribe } from "@prisma/client";
-import { ButtonInteraction, Interaction } from "discord.js";
+import { ButtonInteraction, Client, Interaction } from "discord.js";
 import getErrorEmbed from "src/utils/embeds/getErrorEmbed";
 import getTribe from "src/utils/tribes/getTribe";
 import joinTribe from "src/utils/tribes/joinTribe";
@@ -17,7 +17,11 @@ export = {
 	permissions: [],
 	deferred: true,
 
-	callback: async (client, interaction: ButtonInteraction, tribeId) => {
+	callback: async (
+		client: Client,
+		interaction: ButtonInteraction,
+		tribeId
+	) => {
 		const user = interaction.user;
 		const response = await getTribe({ tribeId });
 
@@ -31,9 +35,9 @@ export = {
 			);
 		}
 		const tribe = response.data as DiscordTribe;
-
-		const member = await await joinTribe({
-			member: interaction.member!,
+		const guild = await client.guilds.cache.f; // fetch the guild to get guildmember for funtion argument
+		const res = await await joinTribe({
+			member,
 			tribeId
 		});
 	}

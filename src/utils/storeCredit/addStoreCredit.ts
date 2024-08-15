@@ -10,6 +10,19 @@ export = async ({
 	guildId
 }: ModifyStoreCreditOptions) => {
 	try {
+		const guild = await db.guild.findUnique({
+			where: { discordId: guildId }
+		});
+		if (!guild) {
+			return {
+				success: false,
+				message:
+					"I couldn't fetch the guild that you are in! Please try again."
+			};
+		}
+
+		const expiresAt = new Date();
+		expiresAt.setSeconds(expiresAt.getSeconds() + guild?.creditExpires);
 		// Creates a log event
 		await db.storeCreditLog.create({
 			data: {
@@ -18,6 +31,7 @@ export = async ({
 				reason,
 				guildId,
 				timestamp: new Date(),
+				expiresAt,
 				userId
 			}
 		});

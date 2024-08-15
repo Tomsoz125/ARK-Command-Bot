@@ -10,8 +10,8 @@ import {
 	User
 } from "discord.js";
 import { APIResponse } from "typings";
-import { colours } from "../../../config.json";
-import getCommandLink from "../getCommandLink";
+import { colours } from "../../../../config.json";
+import getCommandLink from "../../getCommandLink";
 
 export = async ({
 	tribe,

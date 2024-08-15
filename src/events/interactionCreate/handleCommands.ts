@@ -23,7 +23,10 @@ export = async (client: Client, interaction: Interaction) => {
 		if (commandObject.deferred || commandObject.deferred === undefined)
 			await interaction.deferReply({ ephemeral: true });
 
-		if (!interaction.guild && interaction.user.id !== "724833136894279690")
+		if (
+			(!interaction.guild || !interaction.inCachedGuild()) &&
+			interaction.user.id !== "724833136894279690"
+		)
 			return;
 
 		if (
